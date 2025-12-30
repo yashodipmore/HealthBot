@@ -1,0 +1,38 @@
+# HealthBot Monitor - Development Docker Compose
+# Lightweight setup for local development
+
+version: '3.8'
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: healthbot-backend-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_APP_KEY=${DD_APP_KEY}
+      - DD_SITE=${DD_SITE:-datadoghq.com}
+      - DD_SERVICE=healthbot-monitor
+      - DD_ENV=development
+      - DD_VERSION=1.0.0
+      - PORT=8000
+      - HOST=0.0.0.0
+      - DEBUG=true
+      - FRONTEND_URL=http://localhost:3000
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+    networks:
+      - healthbot-dev
+
+  # Frontend runs separately with npm start for hot reload
+  # Use: cd frontend && npm start
+
+networks:
+  healthbot-dev:
+    driver: bridge

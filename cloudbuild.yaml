@@ -1,0 +1,109 @@
+# Cloud Build Configuration for HealthBot Monitor
+# Deploy to Google Cloud Run
+
+steps:
+  # Build Backend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/healthbot-backend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/healthbot-backend:latest'
+      - './backend'
+
+  # Push Backend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/healthbot-backend:$COMMIT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/healthbot-backend:latest'
+
+  # Deploy Backend to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'healthbot-backend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/healthbot-backend:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'GOOGLE_API_KEY=${_GOOGLE_API_KEY},DD_API_KEY=${_DD_API_KEY},DD_APP_KEY=${_DD_APP_KEY},DD_SITE=datadoghq.com'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '10'
+
+  # Build Frontend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/healthbot-frontend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/healthbot-frontend:latest'
+      - '--build-arg'
+      - 'REACT_APP_API_URL=https://healthbot-backend-${PROJECT_ID}.a.run.app'
+      - './frontend'
+
+  # Push Frontend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/healthbot-frontend:$COMMIT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/healthbot-frontend:latest'
+
+  # Deploy Frontend to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'healthbot-frontend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/healthbot-frontend:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--memory'
+      - '256Mi'
+      - '--cpu'
+      - '1'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '5'
+
+images:
+  - 'gcr.io/$PROJECT_ID/healthbot-backend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/healthbot-backend:latest'
+  - 'gcr.io/$PROJECT_ID/healthbot-frontend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/healthbot-frontend:latest'
+
+substitutions:
+  _GOOGLE_API_KEY: ''
+  _DD_API_KEY: ''
+  _DD_APP_KEY: ''
+
+options:
+  logging: CLOUD_LOGGING_ONLY
