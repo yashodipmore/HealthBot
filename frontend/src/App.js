@@ -104,7 +104,7 @@ function App() {
               <span>{isCheckingConnection ? 'Checking...' : isConnected ? 'Connected' : 'Offline'}</span>
             </div>
             <a
-              href="https://github.com"
+              href="https://github.com/yashodipmore/HealthBot"
               target="_blank"
               rel="noopener noreferrer"
               className="icon-btn"
