@@ -4,8 +4,11 @@
  */
 import axios from 'axios';
 
-// API Base URL - uses proxy in development
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// API Base URL - Production URL with fallback to localhost for development
+const API_BASE_URL = process.env.REACT_APP_API_URL || 
+  (window.location.hostname === 'localhost' 
+    ? 'http://localhost:8000' 
+    : 'https://healthbot-usp2.onrender.com');
 
 // Create axios instance with default config
 const api = axios.create({
