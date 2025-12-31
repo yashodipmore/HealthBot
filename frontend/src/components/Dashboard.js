@@ -4,8 +4,6 @@
  */
 import React, { useState, useEffect } from 'react';
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -16,7 +14,7 @@ import {
   BarChart,
   Bar
 } from 'recharts';
-import { getMetrics, getDashboardData, getStats, getAlerts, setupAlerts } from '../services/api';
+import { getMetrics, getDashboardData, getStats, getAlerts } from '../services/api';
 import './Dashboard.css';
 
 // Professional SVG Icons
@@ -152,6 +150,7 @@ function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  // eslint-disable-next-line no-unused-vars
   const [setupMessage, setSetupMessage] = useState(null);
 
   // Fetch metrics
