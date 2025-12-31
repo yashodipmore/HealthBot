@@ -30,23 +30,7 @@ const UserIcon = () => (
   </svg>
 );
 
-const InfoIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="16" x2="12" y2="12" />
-    <line x1="12" y1="8" x2="12.01" y2="8" />
-  </svg>
-);
-
-// TrashIcon and HeartPulseIcon removed - not currently used
-
-const LoadingDots = () => (
-  <div className="typing-dots">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-);
+// InfoIcon and LoadingDots components available if needed
 
 // Sample health questions for quick start
 const SAMPLE_QUESTIONS = [
@@ -58,11 +42,35 @@ const SAMPLE_QUESTIONS = [
   "How can I reduce stress naturally?"
 ];
 
+// Lightbulb icon for tips
+const LightbulbIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+    <path d="M9 18h6"/>
+    <path d="M10 22h4"/>
+  </svg>
+);
+
+// Shield icon for disclaimer
+const ShieldIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+
+// Check icon
+const CheckIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
 function Chat({ onMetricsUpdate }) {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
   
   const messagesEndRef = useRef(null);
@@ -194,65 +202,152 @@ How can I help you today?`,
   };
 
   return (
-    <div className="chat-container">
+    <div className="chat">
+      {/* Sidebar */}
+      <div className="chat-sidebar">
+        {/* Header with New Chat */}
+        <div className="sidebar-header">
+          <h3>Chat History</h3>
+          <button className="new-chat-btn" onClick={() => {
+            setMessages([{
+              id: 'welcome',
+              role: 'assistant',
+              content: `👋 Hello! I'm HealthBot, your AI health assistant.\n\nI can help you with:\n• General health questions\n• Symptom information\n• Nutrition and wellness tips\n• Lifestyle recommendations\n\n**Disclaimer:** I provide general information only. Always consult a healthcare professional for medical advice.\n\nHow can I help you today?`,
+              timestamp: new Date()
+            }]);
+            setConversationId(null);
+          }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            New Chat
+          </button>
+        </div>
+
+        {/* Chat History */}
+        <div className="chat-history">
+          {conversationId ? (
+            <div className="history-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>Current Chat</span>
+            </div>
+          ) : (
+            <div className="history-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <p>No chat history yet.<br/>Start a new conversation!</p>
+            </div>
+          )}
+        </div>
+
+        {/* Tips */}
+        <div className="sidebar-tips">
+          <h4>Quick Tips</h4>
+          <div className="tip-item">
+            <CheckIcon />
+            <span>Be specific with your questions</span>
+          </div>
+          <div className="tip-item">
+            <CheckIcon />
+            <span>Include relevant symptoms</span>
+          </div>
+          <div className="tip-item">
+            <ShieldIcon />
+            <span>Always consult a doctor</span>
+          </div>
+        </div>
+      </div>
+
       {/* Main Chat Area */}
       <div className="chat-main">
         {/* Chat Header */}
         <div className="chat-header">
-          <div className="chat-header-info">
-            <div className="chat-avatar">
+          <div className="chat-header-title">
+            <div className="avatar">
               <BotIcon />
             </div>
-            <div className="chat-header-text">
-              <h2>HealthBot</h2>
-              <p><span className="online-dot"></span> Online</p>
+            <div>
+              <h2>HealthBot Assistant</h2>
+              <span>Powered by Gemini AI</span>
             </div>
           </div>
-          {conversationId && (
-            <span className="conversation-id">ID: {conversationId.slice(-8)}</span>
-          )}
+          <div className="chat-header-status">
+            <span className="status-dot"></span>
+            Online
+          </div>
         </div>
 
         {/* Messages Area */}
         <div className="chat-messages">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`message ${message.role === 'assistant' ? 'bot' : 'user'} ${message.isError ? 'error' : ''}`}
-            >
-              <div className="message-avatar">
-                {message.role === 'assistant' ? <BotIcon /> : <UserIcon />}
+          {messages.length <= 1 ? (
+            /* Welcome Screen with Quick Prompts */
+            <div className="welcome-message">
+              <div className="welcome-icon">
+                <BotIcon />
               </div>
-              <div className="message-content">
-                <div className="message-text">
-                  {formatMessageContent(message.content)}
+              <h2>Welcome to HealthBot!</h2>
+              <p>I'm your AI health assistant. Ask me anything about health, wellness, symptoms, or nutrition.</p>
+              <div className="quick-prompts">
+                {SAMPLE_QUESTIONS.slice(0, 4).map((q, i) => (
+                  <button
+                    key={i}
+                    className="quick-prompt"
+                    onClick={() => handleQuickQuestion(q)}
+                    disabled={isLoading}
+                  >
+                    <LightbulbIcon />
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Chat Messages */
+            messages.slice(1).map((message) => (
+              <div
+                key={message.id}
+                className={`message ${message.role === 'assistant' ? 'bot' : 'user'} ${message.isError ? 'error' : ''}`}
+              >
+                <div className="message-avatar">
+                  {message.role === 'assistant' ? <BotIcon /> : <UserIcon />}
                 </div>
-                <div className="message-meta">
-                  <span className="message-time">
+                <div className="message-content">
+                  <div className="message-bubble">
+                    {formatMessageContent(message.content)}
+                  </div>
+                  <div className="message-time">
                     {message.timestamp.toLocaleTimeString([], { 
                       hour: '2-digit', 
                       minute: '2-digit' 
                     })}
-                  </span>
-                  {message.metrics && (
-                    <span className="message-metrics">
-                      {message.metrics.responseTime.toFixed(0)}ms • {message.metrics.tokens} tokens
-                    </span>
-                  )}
+                    {message.metrics && (
+                      <span style={{ marginLeft: '8px', color: '#f97316' }}>
+                        {message.metrics.responseTime.toFixed(0)}ms • {message.metrics.tokens} tokens
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
 
           {/* Loading Indicator */}
           {isLoading && (
-            <div className="message bot loading">
+            <div className="message bot">
               <div className="message-avatar">
                 <BotIcon />
               </div>
               <div className="message-content">
-                <div className="message-text">
-                  <LoadingDots />
+                <div className="message-bubble">
+                  <div className="typing-indicator">
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -261,50 +356,37 @@ How can I help you today?`,
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Error Display */}
-        {error && (
-          <div className="chat-error">
-            <InfoIcon />
-            <span>{error}</span>
-          </div>
-        )}
+        {/* Medical Disclaimer */}
+        <div className="medical-disclaimer">
+          <ShieldIcon />
+          <span>HealthBot provides general information only. Always consult a healthcare professional for medical advice.</span>
+        </div>
 
         {/* Input Area */}
         <div className="chat-input-container">
-          <textarea
-            ref={inputRef}
-            className="chat-input"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask a health question..."
-            rows={1}
-            disabled={isLoading}
-          />
-          <button
-            className="send-button"
-            onClick={() => handleSendMessage()}
-            disabled={!inputValue.trim() || isLoading}
-          >
-            {isLoading ? <LoadingDots /> : <SendIcon />}
-          </button>
-        </div>
-      </div>
-
-      {/* Sidebar */}
-      <div className="chat-sidebar">
-        <div className="sidebar-section">
-          <h3>Try asking:</h3>
-          <div className="quick-questions-list">
-            {SAMPLE_QUESTIONS.slice(0, 3).map((q, i) => (
-              <button
-                key={i}
-                className="quick-question-btn"
-                onClick={() => handleQuickQuestion(q)}
-              >
-                {q}
-              </button>
-            ))}
+          <div className="chat-input-wrapper">
+            <div className="input-box">
+              <textarea
+                ref={inputRef}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your health question..."
+                rows={1}
+                disabled={isLoading}
+              />
+            </div>
+            <button
+              className="send-btn"
+              onClick={() => handleSendMessage()}
+              disabled={!inputValue.trim() || isLoading}
+            >
+              <SendIcon />
+            </button>
+          </div>
+          <div className="input-hint">
+            <span><kbd>Enter</kbd> to send</span>
+            <span><kbd>Shift</kbd> + <kbd>Enter</kbd> for new line</span>
           </div>
         </div>
       </div>
