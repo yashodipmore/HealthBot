@@ -1,8 +1,9 @@
 /**
  * HealthBot Monitor - Main App Component
- * Professional White Theme with Orange-Violet Accents
+ * Professional White Theme with Orange Accents
  */
 import React, { useState, useEffect } from 'react';
+import Landing from './components/Landing';
 import Chat from './components/Chat';
 import Dashboard from './components/Dashboard';
 import { checkHealth } from './services/api';
@@ -37,7 +38,15 @@ const GitHubIcon = () => (
   </svg>
 );
 
+const HomeIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+);
+
 function App() {
+  const [currentPage, setCurrentPage] = useState('landing'); // 'landing', 'chat', 'dashboard'
   const [activeTab, setActiveTab] = useState('chat');
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
@@ -66,13 +75,28 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // Handle navigation from landing page
+  const handleGetStarted = () => {
+    setCurrentPage('app');
+    setActiveTab('chat');
+  };
+
+  const handleGoHome = () => {
+    setCurrentPage('landing');
+  };
+
+  // Show landing page
+  if (currentPage === 'landing') {
+    return <Landing onGetStarted={handleGetStarted} />;
+  }
+
   return (
     <div className="app">
       {/* Navigation Header */}
       <nav className="nav">
         <div className="nav-container">
-          {/* Logo */}
-          <div className="nav-logo">
+          {/* Logo with Home button */}
+          <div className="nav-logo" onClick={handleGoHome} style={{ cursor: 'pointer' }}>
             <div className="nav-logo-icon">
               <HeartPulseIcon />
             </div>
@@ -81,6 +105,14 @@ function App() {
 
           {/* Navigation Links */}
           <div className="nav-links">
+            <button
+              className="nav-link"
+              onClick={handleGoHome}
+              title="Back to Home"
+            >
+              <HomeIcon />
+              <span>Home</span>
+            </button>
             <button
               className={`nav-link ${activeTab === 'chat' ? 'active' : ''}`}
               onClick={() => setActiveTab('chat')}
